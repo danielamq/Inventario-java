@@ -27,12 +27,17 @@ public class VentaController {
     }
 
     @PostMapping
-    public ResponseEntity<ProductoEntity> crearVenta(@RequestBody VentaRequest request) {
-        return ResponseEntity.ok(ventaService.crearVenta(request));
+    public ResponseEntity<List<VentaEntity>> procesarVentas(@RequestBody List<VentaRequest> requests) {
+        return ResponseEntity.ok(ventaService.procesarVentas(requests));
+    }
+
+    @GetMapping("/{id}")
+    public VentaEntity obtenerVentaPorId(@PathVariable Long id) {
+        return ventaService.obtenerVentaPorId(id);
     }
 
     @DeleteMapping("/{id}")
-    public void eliminarProducto(@PathVariable Long id) {
+    public void eliminarVenta(@PathVariable Long id) {
         ventaService.eliminarVenta(id);
     }
 }

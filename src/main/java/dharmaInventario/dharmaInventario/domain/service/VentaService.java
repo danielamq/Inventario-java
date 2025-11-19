@@ -10,8 +10,10 @@ import dharmaInventario.dharmaInventario.domain.Repository.VentaRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class VentaService {
@@ -19,12 +21,10 @@ public class VentaService {
     private final VentaRepository ventaRepository;
     private final ProductoRepository productoRepository;
     private final DistribuidoresRepository distribuidorRepository;
-    private final DistribuidoresRepository distribuidoresRepository;
 
     public VentaService(VentaRepository ventaRepository, ProductoRepository productoRepository, DistribuidoresRepository distribuidoresRepository) {
         this.ventaRepository = ventaRepository;
         this.productoRepository = productoRepository;
-        this.distribuidoresRepository = distribuidoresRepository;
         this.distribuidorRepository = distribuidoresRepository;
     }
     public List<VentaEntity> listarVentas() {
@@ -32,62 +32,82 @@ public class VentaService {
     }
 
     @Transactional
-    public ProductoEntity crearVenta(VentaRequest request) {
+    public List<VentaEntity> procesarVentas(List<VentaRequest> ventas) {
+
+        List<VentaEntity> resultado = new ArrayList<>();
+
+        for (VentaRequest req : ventas) {
+            resultado.add(procesarVentaIndividual(req));
+        }
+
+        return resultado;
+    }
+
+    @Transactional
+    public VentaEntity procesarVentaIndividual(VentaRequest request) {
+
         if (request.getNombreCliente() == null) {
             throw new IllegalArgumentException("La venta debe tener un cliente");
         }
 
-        List<ProductoEntity> productos = productoRepository.findByNombreIgnoreCaseContaining(request.getNombreProducto());
-        if (productos.isEmpty()) {
-            throw new RuntimeException("No se encontró ningún producto parecido a: " + request.getNombreProducto());
-        }
-
-        ProductoEntity productoVendido = productos.get(0);
+        ProductoEntity producto = productoRepository.findById((long) request.getProductoId())
+                .orElseThrow(() -> new RuntimeException("Producto no encontrado"));
 
         VentaEntity venta = new VentaEntity();
         venta.setNombreCliente(request.getNombreCliente());
         venta.setCantidad(request.getCantidad());
         venta.setFecha(new Date());
-        venta.setProducto(productoVendido);
+        venta.setProducto(producto);
         venta.setEsMayorista(request.isEsMayorista());
+        venta.setDescuentoAdicional(request.getDescuentoAdicional());
 
-        // Si tiene distribuidor, lo buscamos
+        // 🔹 Si tiene distribuidor — descontar consignación
         if (request.getDistribuidorId() != null) {
+
             DistribuidorEntity distribuidor = distribuidorRepository.findById(request.getDistribuidorId())
-                    .orElseThrow(() -> new RuntimeException("Distribuidor no encontrado con ID: " + request.getDistribuidorId()));
+                    .orElseThrow(() -> new RuntimeException("Distribuidor no encontrado"));
+
+            if (distribuidor.getCantidadConsignada() < request.getCantidad()) {
+                throw new RuntimeException("Stock consignado insuficiente.");
+            }
+
+            distribuidor.setCantidadConsignada(
+                    distribuidor.getCantidadConsignada() - request.getCantidad()
+            );
+
+            producto.setCantidadConsignacion(
+                    producto.getCantidadConsignacion() - request.getCantidad()
+            );
 
             venta.setDistribuidor(distribuidor);
 
-            // 🔹 Descontar del stock consignado
-
-            if (distribuidor.getCantidadConsignada() < request.getCantidad()) {
-                throw new RuntimeException("El distribuidor no tiene suficiente stock en consignación.");
-            }
-
-            distribuidor.setCantidadConsignada(distribuidor.getCantidadConsignada() - request.getCantidad());
-            productoVendido.setCantidadConsignacion(productoVendido.getCantidadConsignacion() - request.getCantidad());
-
             distribuidorRepository.save(distribuidor);
+
         } else {
-            // 🔹 Descontar del stock real
-            int nuevoStock = productoVendido.getCantidadReal() - request.getCantidad();
+            // 🔹 Si no tiene distribuidor — descontar stock real
+            int nuevoStock = producto.getCantidadReal() - request.getCantidad();
             if (nuevoStock < 0) {
-                throw new RuntimeException("Stock insuficiente para este producto.");
+                throw new RuntimeException("Stock insuficiente del producto.");
             }
-            productoVendido.setCantidadReal(nuevoStock);
+            producto.setCantidadReal(nuevoStock);
         }
 
-        // Establecer precio según tipo de venta
-        if (request.isEsMayorista()) {
-            venta.setPrecioUsado(productoVendido.getPrecioMayorista());
+        // 🔹 Determinar precio usado
+        if (venta.isEsMayorista()) {
+            venta.setPrecioUsado(producto.getPrecioMayorista());
+            if (venta.getDescuentoAdicional() != null) {
+                venta.setPrecioUsado(venta.getPrecioUsado() - venta.getDescuentoAdicional());
+            }
         } else {
-            venta.setPrecioUsado(productoVendido.getPrecioDetal());
+            venta.setPrecioUsado(producto.getPrecioDetal());
         }
 
-        productoRepository.save(productoVendido);
-        ventaRepository.save(venta);
+        productoRepository.save(producto);
+        return ventaRepository.save(venta);
+    }
 
-        return productoVendido;
+    public VentaEntity obtenerVentaPorId(Long id) {
+        return ventaRepository.findById(id).orElse(null);
     }
 
     public void eliminarVenta(Long id) {
