@@ -29,6 +29,9 @@ public class VentaEntity {
     @Column(name = "precio_usado")
     private Double precioUsado;
 
+    @Column(name = "descuento_adicional")
+    private Double descuentoAdicional;
+
     @Column(name = "fecha")
     private Date fecha;
 

@@ -40,20 +40,17 @@ public class ProductoService {
         producto.setCantidadConsignacion(request.getCantidadConsignacion());
         producto.setPorcentajeDetal(request.getPorcentajeDetal());
         producto.setPorcentajeMayorista(request.getPorcentajeMayorista());
-        producto.setDescuentoAdicional(request.getDescuentoAdicional());
 
         // Calcular precios solo si hay porcentajes
         if (request.getPorcentajeMayorista() != null) {
-            double descuento = request.getDescuentoAdicional() != null ? request.getDescuentoAdicional() : 0;
             producto.setPrecioMayorista(
-                    request.getCosto() * (1 + (request.getPorcentajeMayorista() / 100)) - descuento
+                    request.getCosto() * (1 + (request.getPorcentajeMayorista() / 100))
             );
         }
 
         if (request.getPorcentajeDetal() != null) {
-            double descuento = request.getDescuentoAdicional() != null ? request.getDescuentoAdicional() : 0;
             producto.setPrecioDetal(
-                    request.getCosto() * (1 + (request.getPorcentajeDetal() / 100)) - descuento
+                    request.getCosto() * (1 + (request.getPorcentajeDetal() / 100))
             );
         }
 
@@ -81,22 +78,18 @@ public class ProductoService {
         if (request.getPorcentajeDetal() != null) productoExistente.setPorcentajeDetal(request.getPorcentajeDetal());
         if (request.getPorcentajeMayorista() != null)
             productoExistente.setPorcentajeMayorista(request.getPorcentajeMayorista());
-        if (request.getDescuentoAdicional() != null)
-            productoExistente.setDescuentoAdicional(request.getDescuentoAdicional());
 
         // Recalcular precios solo si hay cambios de costo o porcentajes
         if (productoExistente.getCosto() != null) {
-            Double descuento = productoExistente.getDescuentoAdicional() != null ? productoExistente.getDescuentoAdicional() : 0.0;
-
             if (productoExistente.getPorcentajeMayorista() != null) {
                 productoExistente.setPrecioMayorista(
-                        productoExistente.getCosto() * (1 + (productoExistente.getPorcentajeMayorista() / 100)) - descuento
+                        productoExistente.getCosto() * (1 + (productoExistente.getPorcentajeMayorista() / 100))
                 );
             }
 
             if (productoExistente.getPorcentajeDetal() != null) {
                 productoExistente.setPrecioDetal(
-                        productoExistente.getCosto() * (1 + (productoExistente.getPorcentajeDetal() / 100)) - descuento
+                        productoExistente.getCosto() * (1 + (productoExistente.getPorcentajeDetal() / 100))
                 );
             }
         }

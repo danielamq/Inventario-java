@@ -10,5 +10,4 @@ public class ProductoRequest {
     private Double porcentajeDetal;
     private Integer cantidadReal;
     private Integer cantidadConsignacion;
-    private Double descuentoAdicional;
 }

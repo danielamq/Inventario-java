@@ -36,9 +36,6 @@ public class ProductoEntity {
     @Column(name = "porcentaje_mayorista")
     private Double porcentajeMayorista;
 
-    @Column(name = "descuento_adicional")
-    private Double descuentoAdicional;
-
     @Column(name = "porcentaje_detal")
     private Double porcentajeDetal;
 }

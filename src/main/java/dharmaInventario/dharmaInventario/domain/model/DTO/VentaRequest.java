@@ -7,10 +7,10 @@ import java.util.Date;
 
 @Data
 public class VentaRequest {
-    private String nombreProducto;
+    private Integer productoId;
     private Integer cantidad;
     private String nombreCliente;
     private boolean esMayorista;
-    private Double precioUsado;
+    private Double descuentoAdicional;
     private Long distribuidorId;
 }
