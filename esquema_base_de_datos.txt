@@ -1,0 +1,63 @@
+-- 🧩 TABLA: productos
+-- =============================================
+CREATE TABLE productos (
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    costo DOUBLE PRECISION NOT NULL,
+    porcentaje_mayorista DOUBLE PRECISION,
+    porcentaje_detal DOUBLE PRECISION,
+    precio_mayorista DOUBLE PRECISION,
+    precio_detal DOUBLE PRECISION,
+    cantidad_bodega INTEGER DEFAULT 0,
+    cantidad_consignacion INTEGER DEFAULT 0
+);
+
+-- =============================================
+-- 🧩 TABLA: distribuidores
+-- =============================================
+CREATE TABLE distribuidores (
+    id BIGSERIAL PRIMARY KEY,
+    nombre VARCHAR(255) NOT NULL,
+    producto_id BIGINT NOT NULL,
+    cantidad INTEGER DEFAULT 0,
+    cantidad_consignada INTEGER DEFAULT 0,
+    precio_asignado DOUBLE PRECISION,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_distribuidor_producto FOREIGN KEY (producto_id)
+        REFERENCES productos (id) ON DELETE CASCADE
+);
+
+-- =============================================
+-- 🧩 TABLA: ventas
+-- =============================================
+CREATE TABLE ventas (
+    id BIGSERIAL PRIMARY KEY,
+    producto_id BIGINT NOT NULL,
+    distribuidor_id BIGINT,
+    nombre_cliente VARCHAR(255),
+    cantidad INTEGER NOT NULL,
+    precio_usado DOUBLE PRECISION,
+    descuento_adicional DOUBLE PRECISION DEFAULT 0,
+    es_mayorista BOOLEAN DEFAULT FALSE,
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_venta_producto FOREIGN KEY (producto_id)
+        REFERENCES productos (id) ON DELETE CASCADE,
+    CONSTRAINT fk_venta_distribuidor FOREIGN KEY (distribuidor_id)
+        REFERENCES distribuidores (id) ON DELETE SET NULL
+);
+
+-- =============================================
+-- 🔍 ÍNDICES Y OPTIMIZACIÓN
+-- =============================================
+CREATE INDEX idx_productos_nombre ON productos (LOWER(nombre));
+CREATE INDEX idx_distribuidores_nombre ON distribuidores (LOWER(nombre));
+CREATE INDEX idx_ventas_fecha ON ventas (fecha);
+
+_ ===========================
+- - login
+- - ======================
+CREATE TABLE login (
+    id SERIAL PRIMARY KEY,
+    usuario VARCHAR(100) NOT NULL UNIQUE,
+    contrasena VARCHAR(255) NOT NULL
+);
