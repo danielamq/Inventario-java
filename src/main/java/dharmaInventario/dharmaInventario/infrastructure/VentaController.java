@@ -15,6 +15,7 @@ import java.util.List;
 @RequestMapping("/venta")
 @CrossOrigin(origins = "http://localhost:4200")
 public class VentaController {
+
     private final VentaService ventaService;
 
     public VentaController(VentaService ventaService) {
@@ -26,13 +27,22 @@ public class VentaController {
         return ventaService.listarVentas();
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<VentaEntity> obtenerVentaPorId(@PathVariable Long id) {
+        VentaEntity venta = ventaService.obtenerVentaPorId(id);
+        if (venta == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(venta);
+    }
+
     @PostMapping
-    public ResponseEntity<ProductoEntity> crearVenta(@RequestBody VentaRequest request) {
+    public ResponseEntity<VentaEntity> crearVenta(@RequestBody VentaRequest request) {
         return ResponseEntity.ok(ventaService.crearVenta(request));
     }
 
     @DeleteMapping("/{id}")
-    public void eliminarProducto(@PathVariable Long id) {
+    public void eliminar(@PathVariable Long id) {
         ventaService.eliminarVenta(id);
     }
 }

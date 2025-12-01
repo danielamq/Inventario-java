@@ -1,4 +1,4 @@
-package dharmaInventario.dharmaInventario.domain.Repository;
+package dharmaInventario.dharmaInventario.domain.repository;
 
 import dharmaInventario.dharmaInventario.domain.model.Entity.UsuarioEntity;
 import org.springframework.data.jpa.repository.JpaRepository;

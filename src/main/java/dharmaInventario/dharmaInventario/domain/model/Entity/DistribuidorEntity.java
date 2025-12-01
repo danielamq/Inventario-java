@@ -1,7 +1,11 @@
 package dharmaInventario.dharmaInventario.domain.model.Entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "distribuidores")
@@ -15,16 +19,14 @@ public class DistribuidorEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "nombre")
     private String nombre;
 
-    @Column(name = "cantidad_consignada")
-    private Integer cantidadConsignada;
+    @OneToMany(mappedBy = "distribuidor", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("productos")
+    @Builder.Default
+    private List<DistribuidorProductoEntity> productos = new ArrayList<>();
 
-    @Column(name = "precio_asignado")
-    private Double precioAsignado;
-
-    @ManyToOne
-    @JoinColumn(name = "producto_id", nullable = false)
-    private ProductoEntity producto;
+    @OneToMany(mappedBy = "distribuidor", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("precios")
+    private List<DistribuidorPrecioEntity> preciosEspeciales = new ArrayList<>();
 }

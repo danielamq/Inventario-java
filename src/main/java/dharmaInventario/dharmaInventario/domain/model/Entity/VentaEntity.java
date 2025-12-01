@@ -1,9 +1,12 @@
 package dharmaInventario.dharmaInventario.domain.model.Entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "ventas")
@@ -17,8 +20,9 @@ public class VentaEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "cantidad")
-    private Integer cantidad;
+    @OneToMany(mappedBy = "venta", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
+    private List<VentaItemEntity> items = new ArrayList<>();
 
     @Column(name = "nombre_cliente")
     private String nombreCliente;
@@ -26,18 +30,14 @@ public class VentaEntity {
     @Column(name = "es_mayorista")
     private boolean esMayorista;
 
-    @Column(name = "precio_usado")
-    private Double precioUsado;
-
     @Column(name = "descuento_adicional")
     private Double descuentoAdicional;
 
+    @Column(name = "total")
+    private Double total;
+
     @Column(name = "fecha")
     private Date fecha;
-
-    @ManyToOne
-    @JoinColumn(name = "producto_id", nullable = false)
-    private ProductoEntity producto;
 
     @ManyToOne
     @JoinColumn(name = "distribuidor_id")

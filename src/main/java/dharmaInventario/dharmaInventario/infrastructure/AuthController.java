@@ -1,6 +1,6 @@
 package dharmaInventario.dharmaInventario.infrastructure;
 
-import dharmaInventario.dharmaInventario.domain.Repository.UsuarioRepository;
+import dharmaInventario.dharmaInventario.domain.repository.UsuarioRepository;
 import dharmaInventario.dharmaInventario.domain.Utils.JwtUtil;
 import dharmaInventario.dharmaInventario.domain.model.DTO.LoginRequest;
 import dharmaInventario.dharmaInventario.domain.model.DTO.LoginResponse;

@@ -1,6 +1,6 @@
 package dharmaInventario.dharmaInventario.domain.service;
 
-import dharmaInventario.dharmaInventario.domain.Repository.UsuarioRepository;
+import dharmaInventario.dharmaInventario.domain.repository.UsuarioRepository;
 import dharmaInventario.dharmaInventario.domain.model.Entity.UsuarioEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.User;

@@ -2,7 +2,7 @@ package dharmaInventario.dharmaInventario.domain.service;
 
 import dharmaInventario.dharmaInventario.domain.model.DTO.ProductoRequest;
 import dharmaInventario.dharmaInventario.domain.model.Entity.ProductoEntity;
-import dharmaInventario.dharmaInventario.domain.Repository.ProductoRepository;
+import dharmaInventario.dharmaInventario.domain.repository.ProductoRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -67,7 +67,6 @@ public class ProductoService {
         ProductoEntity productoExistente = productoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Producto con ID " + id + " no encontrado."));
 
-        // Actualizar solo los campos que vengan en el request (sin perder los existentes)
         if (request.getNombre() != null) productoExistente.setNombre(request.getNombre());
         if (request.getCosto() != null) productoExistente.setCosto(request.getCosto());
         if (request.getCantidadReal() != null) productoExistente.setCantidadReal(request.getCantidadReal());
