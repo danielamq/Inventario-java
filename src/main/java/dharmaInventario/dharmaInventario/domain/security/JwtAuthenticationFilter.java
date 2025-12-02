@@ -21,7 +21,7 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final UserDetailsService userDetailsService; // tu CustomUserDetailsService
+    private final UserDetailsService userDetailsService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -31,6 +31,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String username;
+
+        String path = request.getServletPath();
+        if (path.equals("/api/auth/registrar") || path.equals("/api/auth/login")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         // Si no hay token o no empieza por Bearer, sigue la cadena
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
